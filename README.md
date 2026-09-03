@@ -1,10 +1,17 @@
 # Global Health Econometric Analysis & EDA
 
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white)
+![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)
+![SciPy](https://img.shields.io/badge/SciPy-8CAAE6?style=flat&logo=scipy&logoColor=white)
+![ReportLab](https://img.shields.io/badge/ReportLab-PDF_Generation-red)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-Visualization-blue)
+![Seaborn](https://img.shields.io/badge/Seaborn-Statistical_Plots-teal)
+![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat&logo=pytest&logoColor=white)
+
 ![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 ![Coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)
-![Security](https://img.shields.io/badge/security-0_vulnerabilities-blue)
-![Python](https://img.shields.io/badge/python-3.11+-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+![Security](https://img.shields.io/badge/security-0_vulnerabilities-brightgreen)
 
 ## Overview
 This repository contains an automated, highly validated data science pipeline that generates an **IEEE-formatted Exploratory Data Analysis (EDA) report** on global macroeconomic and health indicators.
