@@ -1,0 +1,13 @@
+venv/
+.venv/
+.env*
+.git/
+.agents/
+.codegraph/
+tests/
+__pycache__/
+**/__pycache__/
+*.pyc
+.coverage
+.pytest_cache/
+temp_assets/

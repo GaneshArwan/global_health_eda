@@ -12,27 +12,33 @@
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
 
 ## Overview
-This repository contains an automated, highly validated data science pipeline that generates an **IEEE-formatted Exploratory Data Analysis (EDA) report** on global macroeconomic and health indicators.
+This repository contains a validated data science pipeline and interactive Streamlit dashboard that generate an **IEEE-formatted Exploratory Data Analysis (EDA) report** on synthetic global macroeconomic and health indicators.
 
-The objective is to statistically quantify the dependencies between Gross Domestic Product (GDP) per capita, educational attainment, sanitation infrastructure, and public health outcomes (Life Expectancy and Child Mortality).
+The objective is to quantify relationships between Gross Domestic Product (GDP) per capita, educational attainment, sanitation infrastructure, healthcare spending, physician density, and public health outcomes (Life Expectancy and Child Mortality).
 
 ## Features
-- **Synthetic Data Generation:** Generates a realistic global health dataset (N=200) encompassing multiple macroeconomic indicators.
-- **Econometric Modeling:** Conducts Ordinary Least Squares (OLS) regression, calculates Root Mean Square Error (RMSE), and determines 95% Confidence Intervals.
-- **Anomaly Detection:** Utilizes Z-scores on residuals to identify statistical anomalies where real-world outcomes deviate from baseline expectations.
-- **Automated Reporting:** Dynamically compiles findings, statistics, and colorblind-accessible seaborn visualizations into a professional, double-column IEEE PDF document.
-- **Enterprise Testing:** Achieves 95% test coverage through a `pytest` suite simulating I/O boundaries.
+- **Calibrated Synthetic Data:** Generates a synthetic cross-sectional dataset (`N=200` by default) with regional log-GDP distributions, realistic structural correlations, and ~5% MCAR missingness.
+- **Runtime Guardrails:** Enforces Pydantic parameter bounds, DataFrame schema/domain/finiteness validation, non-zero regression variance checks, and project-root path-traversal protection (`src/guardrails.py`).
+- **Econometric Modeling & Diagnostics:** Computes bivariate and multivariate OLS regressions (95% CI, RMSE, MAE, Adjusted R²), Variance Inflation Factors (VIF), Pearson vs. Spearman correlations, Z-score residual outliers (`|Z| > 2`), and Shapiro-Wilk residual normality tests.
+- **Automated IEEE Reporting:** Compiles 3 statistical tables and 4 colorblind-accessible Seaborn/Matplotlib figures into a double-column IEEE PDF (`eda_research_report.pdf`), with explicit disclosure of synthetic and cross-sectional limitations.
+- **Interactive Dashboard:** Streamlit UI (`app.py`) with region filtering, Preston Curve, Education vs. Child Mortality, Multivariate OLS & Residual Diagnostics, Correlation Heatmap, and PDF export.
+- **Self-Contained Docker & Testing:** Non-root Docker image that pre-generates data and report on build, backed by a `pytest` suite covering pipeline, guardrails, and UI pages.
 
 ## Repository Structure
-```
+```text
 global_health_eda/
-├── data/                       # Contains the generated CSV dataset
-├── src/                        
-│   ├── data_generator.py       # Pipeline: Synthetic dataset generation
-│   └── generate_eda_report.py  # Pipeline: Econometrics & PDF Generation
-├── tests/                      
-│   └── test_pipeline.py        # Pytest integration suite
-├── temp_assets/                # Temporary directory for plot generation
+├── data/                       # Generated CSV dataset (gitignored)
+├── src/
+│   ├── data_generator.py       # Calibrated synthetic dataset generation
+│   ├── generate_eda_report.py  # Econometrics, diagnostics & IEEE PDF generation
+│   └── guardrails.py           # Input, domain, and path-safety guardrails
+├── tests/
+│   ├── test_app.py             # Self-contained Streamlit AppTest suite
+│   └── test_pipeline.py        # Pipeline, econometrics & guardrails unit tests
+├── app.py                      # Interactive Streamlit dashboard
+├── Dockerfile                  # Self-contained non-root container image
+├── requirements.txt            # Runtime dependencies
+├── requirements-dev.txt        # Test & security audit dependencies
 └── README.md                   # Project documentation
 ```
 
@@ -40,11 +46,11 @@ global_health_eda/
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/YourUsername/global_health_eda.git
+git clone https://github.com/GaneshArwan/global_health_eda.git
 cd global_health_eda
 ```
 
-2. Activate a virtual environment (optional but recommended):
+2. Create and activate a virtual environment:
 ```bash
 python -m venv venv
 # Windows:
@@ -55,32 +61,42 @@ source venv/bin/activate
 
 3. Install dependencies:
 ```bash
-pip install pandas numpy matplotlib seaborn scipy scikit-learn reportlab pytest pytest-cov
+pip install -r requirements.txt
+# For testing and security scanning:
+pip install -r requirements-dev.txt
 ```
 
 ## Usage
 
-### 1. Run the Test Suite
-Ensure the environment is structurally sound:
-```bash
-pytest --cov=src tests/
-```
-
-### 2. Generate the Dataset
-Create the synthetic dataset in the `data/` folder:
+### 1. Generate the Dataset
 ```bash
 python src/data_generator.py
 ```
 
-### 3. Compile the PDF Report
-Run the EDA reporting engine. This will execute the regressions, generate the plots, and output `eda_research_report.pdf` into the root directory:
+### 2. Compile the IEEE PDF Report
 ```bash
 python src/generate_eda_report.py
 ```
 
+### 3. Run the Test Suite
+```bash
+pytest --cov=src tests/
+```
+
+### 4. Launch the Streamlit Dashboard
+```bash
+streamlit run app.py
+```
+
+### 5. Run with Docker
+```bash
+docker build -t global-health-eda .
+docker run -p 8501:8501 global-health-eda
+```
+
 ## Key Findings (Abstract)
-Empirical findings validate the Preston Curve paradigm, demonstrating a statistically significant logarithmic relationship between economic output and longevity. Furthermore, OLS regression highlights education as a critical independent variable in reducing child mortality. Results indicate steep diminishing marginal returns for highly developed economies, proving that optimal global capital allocation must aggressively prioritize socio-educational infrastructure in developing nations over pure healthcare spending.
+Empirical estimates on the synthetic cross-sectional dataset (`N=183` complete cases) align with the Preston Curve paradigm (`R²=0.85`), showing a strong log-linear association between GDP per capita and longevity. Multivariate OLS (`Adj. R²=0.90`, `Max VIF=5.40`) indicates that educational attainment and sanitation access retain strong positive associations alongside income, while raw healthcare spending share and physician density add minimal partial explanatory power in this simulated structure.
 
 ## Author
-**William**
+**GaneshArwan (William)**
 wiliamzwili135@gmail.com
