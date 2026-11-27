@@ -3,8 +3,8 @@
 > Automated econometric pipeline, IEEE two-column PDF generator, and Streamlit dashboard analyzing wealth, education, sanitation, and mortality on synthetic cross-sectional country data.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GaneshArwan/global_health_eda/blob/main/notebooks/global_health_eda.ipynb)
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://global-health-eda.streamlit.app/)
 ![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?style=flat&logo=python&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.67+-FF4B4B?style=flat&logo=streamlit&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Non--Root-2496ED?style=flat&logo=docker&logoColor=white)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
@@ -26,6 +26,10 @@ Controlling for income, education (`p = 4.38e-07`), and sanitation (`p = 3.49e-0
 
 ## Quick Start
 
+### Live Demo & Google Colab
+- **Live Dashboard:** [global-health-eda.streamlit.app](https://global-health-eda.streamlit.app/)
+- **Google Colab:** [notebooks/global_health_eda.ipynb](https://colab.research.google.com/github/GaneshArwan/global_health_eda/blob/main/notebooks/global_health_eda.ipynb) — runs the full pipeline and renders all four diagnostic figures without local setup.
+
 ### Local Setup
 ```bash
 git clone https://github.com/GaneshArwan/global_health_eda.git
@@ -42,9 +46,6 @@ python src/data_generator.py        # Writes data/global_health_data.csv
 python src/generate_eda_report.py   # Builds eda_research_report.pdf and plots in temp_assets/
 streamlit run app.py                # Starts dashboard (auto-generates data/PDF if missing)
 ```
-
-### Google Colab
-Open [notebooks/global_health_eda.ipynb](https://colab.research.google.com/github/GaneshArwan/global_health_eda/blob/main/notebooks/global_health_eda.ipynb) in Colab to run the full pipeline and render all four diagnostic figures without local setup.
 
 ### Docker
 ```bash
