@@ -8,7 +8,8 @@ import pandas as pd
 import seaborn as sns
 import streamlit as st
 
-from src.generate_eda_report import compute_econometric_summary
+from src.data_generator import generate_global_health_data
+from src.generate_eda_report import compute_econometric_summary, generate_eda_report
 from src.guardrails import resolve_safe_path, validate_health_dataframe
 
 st.set_page_config(page_title="Global Health EDA", layout="wide", page_icon="ðŸŒ")
@@ -16,8 +17,11 @@ st.set_page_config(page_title="Global Health EDA", layout="wide", page_icon="ðŸŒ
 
 @st.cache_data
 def load_data() -> pd.DataFrame:
-    """Load and validate the global health CSV dataset."""
+    """Load and validate the global health CSV dataset, generating it if absent."""
     csv_path = resolve_safe_path("data/global_health_data.csv")
+    if not csv_path.exists():
+        csv_path.parent.mkdir(parents=True, exist_ok=True)
+        generate_global_health_data().to_csv(csv_path, index=False)
     raw_df = pd.read_csv(csv_path)
     return validate_health_dataframe(raw_df, min_rows=3)
 
@@ -192,6 +196,9 @@ def main() -> None:
         st.header("Download IEEE Report")
         st.markdown("Download the compiled econometric PDF report below.")
         pdf_path = resolve_safe_path("eda_research_report.pdf")
+        if not pdf_path.exists():
+            with st.spinner("Generating IEEE PDF report..."):
+                generate_eda_report()
         if pdf_path.exists():
             with open(pdf_path, "rb") as pdf_file:
                 st.download_button(
@@ -201,7 +208,7 @@ def main() -> None:
                     mime="application/pdf",
                 )
         else:
-            st.error("Report not found. Run `python src/generate_eda_report.py` to generate the PDF.")
+            st.error("Unable to generate PDF report.")
 
 
 if __name__ == "__main__":

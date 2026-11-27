@@ -1,102 +1,94 @@
 # Global Health Econometric Analysis & EDA
 
-![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
-![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white)
-![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white)
-![SciPy](https://img.shields.io/badge/SciPy-8CAAE6?style=flat&logo=scipy&logoColor=white)
-![ReportLab](https://img.shields.io/badge/ReportLab-PDF_Generation-red)
-![Matplotlib](https://img.shields.io/badge/Matplotlib-Visualization-blue)
-![Seaborn](https://img.shields.io/badge/Seaborn-Statistical_Plots-teal)
-![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat&logo=pytest&logoColor=white)
-![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat&logo=streamlit&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+> Automated econometric pipeline, IEEE two-column PDF generator, and Streamlit dashboard analyzing wealth, education, sanitation, and mortality on synthetic cross-sectional country data.
 
-## Overview
-This repository contains a validated data science pipeline and interactive Streamlit dashboard that generate an **IEEE-formatted Exploratory Data Analysis (EDA) report** on synthetic global macroeconomic and health indicators.
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GaneshArwan/global_health_eda/blob/main/notebooks/global_health_eda.ipynb)
+![Python 3.11](https://img.shields.io/badge/Python-3.11-3776AB?style=flat&logo=python&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.67+-FF4B4B?style=flat&logo=streamlit&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Non--Root-2496ED?style=flat&logo=docker&logoColor=white)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-The objective is to quantify relationships between Gross Domestic Product (GDP) per capita, educational attainment, sanitation infrastructure, healthcare spending, physician density, and public health outcomes (Life Expectancy and Child Mortality).
+## What This Project Does
 
-## Features
-- **Calibrated Synthetic Data:** Generates a synthetic cross-sectional dataset (`N=200` by default) with regional log-GDP distributions, realistic structural correlations, and ~5% MCAR missingness.
-- **Runtime Guardrails:** Enforces Pydantic parameter bounds, DataFrame schema/domain/finiteness validation, non-zero regression variance checks, and project-root path-traversal protection (`src/guardrails.py`).
-- **Econometric Modeling & Diagnostics:** Computes bivariate and multivariate OLS regressions (95% CI, RMSE, MAE, Adjusted R²), Variance Inflation Factors (VIF), Pearson vs. Spearman correlations, Z-score residual outliers (`|Z| > 2`), and Shapiro-Wilk residual normality tests.
-- **Automated IEEE Reporting:** Compiles 3 statistical tables and 4 colorblind-accessible Seaborn/Matplotlib figures into a double-column IEEE PDF (`eda_research_report.pdf`), with explicit disclosure of synthetic and cross-sectional limitations.
-- **Interactive Dashboard:** Streamlit UI (`app.py`) with region filtering, Preston Curve, Education vs. Child Mortality, Multivariate OLS & Residual Diagnostics, Correlation Heatmap, and PDF export.
-- **Self-Contained Docker & Testing:** Non-root Docker image that pre-generates data and report on build, backed by a `pytest` suite covering pipeline, guardrails, and UI pages.
+This repository runs an end-to-end exploratory data analysis (EDA) workflow over 200 synthetic country records (`N=183` complete cases after listwise filtering). It estimates bivariate and multivariate ordinary least squares (OLS) models, checks multicollinearity (VIF) and residual normality (Shapiro-Wilk), compiles a two-page IEEE PDF report (`eda_research_report.pdf`), and exposes the same calculations in an interactive Streamlit app (`app.py`).
 
-## Repository Structure
-```text
-global_health_eda/
-├── data/                       # Generated CSV dataset (gitignored)
-├── src/
-│   ├── data_generator.py       # Calibrated synthetic dataset generation
-│   ├── generate_eda_report.py  # Econometrics, diagnostics & IEEE PDF generation
-│   └── guardrails.py           # Input, domain, and path-safety guardrails
-├── tests/
-│   ├── test_app.py             # Self-contained Streamlit AppTest suite
-│   └── test_pipeline.py        # Pipeline, econometrics & guardrails unit tests
-├── app.py                      # Interactive Streamlit dashboard
-├── Dockerfile                  # Self-contained non-root container image
-├── requirements.txt            # Runtime dependencies
-├── requirements-dev.txt        # Test & security audit dependencies
-└── README.md                   # Project documentation
-```
+## Verified Econometric Results (`N=183`, Seed `42`)
 
-## Setup & Installation
+| Model / Check | Outcome | Key Estimates |
+|---|---|---|
+| Preston Curve OLS (`ln(GDP)` -> `Life_Expectancy`) | Longevity (years) | `R² = 0.852`, slope `= 5.54` (`95% CI: [5.20, 5.88]`), `RMSE = 2.96`, `p = 4.54e-77` |
+| Education OLS (`Education_Index` -> `Child_Mortality_Per_1000`) | Child deaths / 1k | `R² = 0.635`, slope `= -143.9` (`95% CI: [-159.9, -127.9]`), `RMSE = 12.81`, `p = 1.77e-41` |
+| Multivariate OLS (5 predictors -> `Life_Expectancy`) | Longevity (years) | `R² = 0.900`, `Adj. R² = 0.897`, `RMSE = 2.44`, `Max VIF = 5.40`, `df = 177` |
+| Residual Diagnostics (Preston OLS) | Model fit & tails | `9` outliers (`\|Z\| > 2`), Shapiro-Wilk `W = 0.994` (`p = 0.649`) |
+| Boundary Censoring Audit | Floor / ceiling caps | `Life_Expectancy >= 85`: `7` (`3.8%`); `Child_Mortality <= 2`: `41` (`22.4%`) |
 
-1. Clone the repository:
+Controlling for income, education (`p = 4.38e-07`), and sanitation (`p = 3.49e-08`), raw healthcare spending share (`p = 0.811`) and physician density (`p = 0.622`) add minimal partial explanatory power in the simulated structural equations.
+
+## Quick Start
+
+### Local Setup
 ```bash
 git clone https://github.com/GaneshArwan/global_health_eda.git
 cd global_health_eda
-```
-
-2. Create and activate a virtual environment:
-```bash
 python -m venv venv
-# Windows:
-.\venv\Scripts\Activate.ps1
-# Unix/MacOS:
-source venv/bin/activate
-```
-
-3. Install dependencies:
-```bash
+# Windows: .\venv\Scripts\Activate.ps1
+# Unix/MacOS: source venv/bin/activate
 pip install -r requirements.txt
-# For testing and security scanning:
-pip install -r requirements-dev.txt
 ```
 
-## Usage
-
-### 1. Generate the Dataset
+### Run Pipeline & Dashboard
 ```bash
-python src/data_generator.py
+python src/data_generator.py        # Writes data/global_health_data.csv
+python src/generate_eda_report.py   # Builds eda_research_report.pdf and plots in temp_assets/
+streamlit run app.py                # Starts dashboard (auto-generates data/PDF if missing)
 ```
 
-### 2. Compile the IEEE PDF Report
-```bash
-python src/generate_eda_report.py
-```
+### Google Colab
+Open [notebooks/global_health_eda.ipynb](https://colab.research.google.com/github/GaneshArwan/global_health_eda/blob/main/notebooks/global_health_eda.ipynb) in Colab to run the full pipeline and render all four diagnostic figures without local setup.
 
-### 3. Run the Test Suite
-```bash
-pytest --cov=src tests/
-```
-
-### 4. Launch the Streamlit Dashboard
-```bash
-streamlit run app.py
-```
-
-### 5. Run with Docker
+### Docker
 ```bash
 docker build -t global-health-eda .
 docker run -p 8501:8501 global-health-eda
 ```
+The image runs as non-root `appuser`, pre-generates the dataset and PDF report during build, and exposes a Python stdlib health check on port `8501`.
 
-## Key Findings (Abstract)
-Empirical estimates on the synthetic cross-sectional dataset (`N=183` complete cases) align with the Preston Curve paradigm (`R²=0.85`), showing a strong log-linear association between GDP per capita and longevity. Multivariate OLS (`Adj. R²=0.90`, `Max VIF=5.40`) indicates that educational attainment and sanitation access retain strong positive associations alongside income, while raw healthcare spending share and physician density add minimal partial explanatory power in this simulated structure.
+### Tests & Security Checks
+```bash
+pip install -r requirements-dev.txt
+pytest --cov=src tests/
+bandit -r src app.py
+pip-audit --skip-editable
+```
+GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) uses `workflow_dispatch` only so pushes and pull requests consume zero free-tier runner minutes.
+
+## Repository Structure
+
+```text
+global_health_eda/
+├── .github/workflows/ci.yml          # Manual-only CI workflow (pytest + bandit)
+├── .streamlit/config.toml            # Headless server & telemetry-off settings
+├── data/                             # Generated CSV directory (gitignored)
+├── notebooks/global_health_eda.ipynb # Self-contained Google Colab notebook
+├── src/
+│   ├── data_generator.py             # Calibrated synthetic dataset generator
+│   ├── generate_eda_report.py        # Econometric summary, plots & IEEE PDF builder
+│   └── guardrails.py                 # Path-traversal, Pydantic bounds & DataFrame checks
+├── tests/
+│   ├── test_app.py                   # Streamlit AppTest suite (auto-seeds missing CSV)
+│   └── test_pipeline.py              # Pipeline, econometrics & guardrails unit tests
+├── app.py                            # Streamlit dashboard (auto-generates CSV/PDF on demand)
+├── Dockerfile                        # Non-root Python 3.11 container
+├── requirements.txt                  # Runtime dependencies
+├── requirements-dev.txt              # Test & security audit dependencies
+└── LICENSE                           # MIT License
+```
+
+## Guardrails & Limitations
+
+- **Runtime Guardrails (`src/guardrails.py`):** Blocks path escapes outside the repository root (`resolve_safe_path`), enforces `GenerationConfig` bounds via Pydantic, strips `inf`/`-inf` and invalid numeric values, checks column domain bounds, and requires non-zero predictor variance before fitting OLS.
+- **Limitations:** Indicators come from a synthetic parametric generator rather than empirical WHO/World Bank panel records; cross-sectional OLS captures statistical association rather than causation; listwise deletion assumes missingness is independent of outcomes (MCAR); and floor clipping on `Child_Mortality_Per_1000` (`22.4%`) attenuates lower-tail variance.
 
 ## Author
-**GaneshArwan (William)**
-wiliamzwili135@gmail.com
+
+**GaneshArwan** — [github.com/GaneshArwan](https://github.com/GaneshArwan)

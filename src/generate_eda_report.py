@@ -553,7 +553,7 @@ def generate_eda_report() -> None:
             "Empirical Assessment of Macroeconomic and<br/>Educational Determinants on Global Health Outcomes",
             title_style,
         ),
-        Paragraph("GaneshArwan<br/>wiliamzwili135@gmail.com", author_style),
+        Paragraph("GaneshArwan<br/>github.com/GaneshArwan", author_style),
         FrameBreak(),
         NextPageTemplate("LaterPages"),
         Paragraph(
